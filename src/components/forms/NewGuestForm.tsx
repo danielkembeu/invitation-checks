@@ -4,7 +4,7 @@ import { FormEvent, useState } from "react";
 import { Button } from "../ui/button";
 import { DialogFooter } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { GuestStatus, Table } from "@/generated/prisma";
+import { Guest, GuestStatus, Table } from "@/generated/prisma";
 import {
   Select,
   SelectContent,
@@ -20,15 +20,17 @@ import { Message } from "./AdminLoginForm";
 
 function getAndIncrementSeatNumber(start: number) {
   let current = parseInt(localStorage.getItem("current") ?? "0", 10);
+  
   if (!current || isNaN(current)) {
     current = start;
   }
+
   localStorage.setItem("current", (current + 1).toString());
   return current;
 }
 
 type NewGuestFormProps = {
-  tables: Table[];
+  tables: (Table & { guests: Guest[] })[];
 };
 
 export function NewGuestForm({ tables }: Readonly<NewGuestFormProps>) {
@@ -38,9 +40,17 @@ export function NewGuestForm({ tables }: Readonly<NewGuestFormProps>) {
 
   async function saveGuest(event: FormEvent) {
     event.preventDefault();
+
     try {
       const form = event.target as HTMLFormElement;
       const formData = new FormData(form);
+
+      const table = tables.find((t) => t.id === selectedTable);
+
+      if (table && table?.capacity < table?.guests.length) {
+        toast.error("La capacité de la table a été excédée. Veuillez sélectionner une autre table");
+        return;
+      }
 
       const seatNumber = getAndIncrementSeatNumber(tables.length);
 
@@ -57,7 +67,7 @@ export function NewGuestForm({ tables }: Readonly<NewGuestFormProps>) {
       if (typeof result === "string") {
         setMessage(result);
       } else {
-        toast.success("Invité ajouté avec succès !", { position: "top-right" });
+        toast.success("Invité ajouté avec succès !");
       }
     } catch (e: any) {
       console.log(e);

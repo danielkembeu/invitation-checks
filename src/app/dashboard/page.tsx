@@ -15,7 +15,9 @@ import {
 import { NewGuestForm } from "@/components/forms/NewGuestForm";
 
 async function getTables() {
-  return await prisma.table.findMany();
+  return await prisma.table.findMany({
+    include: { guests: true },
+  });
 }
 
 async function getGuests() {
