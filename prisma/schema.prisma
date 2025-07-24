@@ -13,3 +13,30 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum GuestStatus {
+  CONFIRMED
+  WAITING
+  ABSENT
+  PRESENT
+}
+
+model Table {
+  id          String  @id @default(uuid())
+  tableNumber Int
+  capacity    Int
+  guests      Guest[]
+}
+
+model Guest {
+  id         String      @id @default(uuid())
+  name       String
+  status     GuestStatus @default(WAITING)
+  tableId    String
+  seatNumber Int
+  code       String      @unique @db.Char(6)
+
+  table Table @relation(fields: [tableId], references: [id])
+
+  @@unique([tableId, seatNumber])
+}
