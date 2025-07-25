@@ -1,18 +1,11 @@
 import { Metric } from "@/components/board/Overview";
-import { DataTable } from "@/components/board/DataTable";
 import { prisma } from "@/db";
+import { Users, Layout, UserCheck2, BookUser, UserMinus2 } from "lucide-react";
+import { GuestStatus } from "@/generated/prisma";
+import { GuestTable } from "@/components/board/GuestTable";
+import { TablesTable } from "@/components/board/TablesTable";
+import { Fragment } from "react";
 import { Navbar } from "@/components/Navbar";
-import { Button } from "@/components/ui/button";
-import { Plus, Eye, Check, Ban } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { NewGuestForm } from "@/components/forms/NewGuestForm";
 
 async function getTables() {
   return await prisma.table.findMany({
@@ -21,147 +14,87 @@ async function getTables() {
 }
 
 async function getGuests() {
-  return await prisma.guest.findMany();
+  return await prisma.guest.findMany({ orderBy: { updatedAt: "desc" } });
 }
 
 export default async function Dashboard() {
   const guests = await getGuests();
   const tables = await getTables();
 
-  const guestColumns = [
-    { header: "Nom", accessor: "name" },
-    { header: "Statut", accessor: "status" },
-    { header: "Place", accessor: "seatNumber" },
-    { header: "Code", accessor: "code" },
-  ];
-
-  const tablesColumns = [
-    { header: "Nom", accessor: "name" },
-    { header: "Statut", accessor: "status" },
-    { header: "Place", accessor: "seatNumber" },
-    { header: "Code", accessor: "code" },
-  ];
-
   return (
-    <section>
-      {/* <Navbar /> */}
+    <Fragment>
+      <Navbar />
 
-      <div className="px-96 py-20">
+      <div className="px-14 md:px-28 lg:px-60 xl:px-96 py-4 md:py-12 lg:py-20">
         <h2 className="text-xl font-bold mb-4">Gestion des invités</h2>
 
-        <div className="flex justify-between items-center gap-2">
-          <Metric label="Nombre total d'invités" value={guests.length} />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
+          <Metric
+            label="Nombre total d'invités"
+            value={guests.length}
+            labelColor="text-gray-600"
+            iconColor="text-gray-600 bg-gray-600/20"
+            contentColors="bg-gray-600/10 text-gray-600 border-gray-600"
+            icon={<BookUser />}
+          />
+
           <Metric
             label="Invités confirmés"
-            value={guests.filter((g) => g.status === "CONFIRMED").length}
+            labelColor="text-green-600"
+            iconColor="text-green-600 bg-green-600/20"
+            contentColors="bg-green-600/10 text-green-600 border-green-600"
+            icon={<UserCheck2 />}
+            value={
+              guests.filter((g) => g.status === GuestStatus.CONFIRMED).length
+            }
           />
+
           <Metric
             label="Invités en attente"
-            value={guests.filter((g) => g.status === "WAITING").length}
+            labelColor="text-yellow-600"
+            iconColor="text-yellow-600 bg-yellow-600/20"
+            contentColors="bg-yellow-600/10 text-yellow-600 border-yellow-600"
+            icon={<Users />}
+            value={
+              guests.filter((g) => g.status === GuestStatus.WAITING).length
+            }
           />
 
-          <Metric label="Tables" value={tables.length} />
-        </div>
+          <Metric
+            label="Invités absents"
+            labelColor="text-red-600"
+            iconColor="text-red-600 bg-red-600/20"
+            contentColors="bg-red-600/10 text-red-600 border-red-600"
+            icon={<UserMinus2 />}
+            value={guests.filter((g) => g.status === GuestStatus.ABSENT).length}
+          />
 
-        <div className="mt-8">
-          <SectionWithDialog
-            title="Liste des tables"
-            dialogTitle="Ajouter une table"
-            dialogDescription="Remplis le formulaire ci-dessous pour ajouter une table."
-          >
-            <NewGuestForm tables={tables} />
-          </SectionWithDialog>
+          {/* Tables */}
 
-          <DataTable
-            columns={guestColumns}
-            data={guests}
-            renderActions={(row) => (
-              <div className="flex items-center justify-between space-x-2">
-                <Button size="icon" title="Voir">
-                  <Eye className="w-4 h-4" />
-                </Button>
+          <Metric label="Les Tables" value={tables.length} icon={<Layout />} />
 
-                <Button size="icon" title="Confirmer">
-                  <Check className="w-4 h-4" />
-                </Button>
+          <Metric
+            label="Les Tables pleines"
+            labelColor="text-red-600"
+            iconColor="text-red-600 bg-red-600/20"
+            contentColors="bg-red-600/10 text-red-600 border-red-600"
+            value={tables.filter((t) => t.guests.length >= t.capacity).length}
+            icon={<Layout />}
+          />
 
-                <Button size="icon" title="Restreindre">
-                  <Ban className="w-4 h-4" />
-                </Button>
-              </div>
-            )}
+          <Metric
+            label="Les Tables disponibles"
+            labelColor="text-green-600"
+            iconColor="text-green-600 bg-green-600/20"
+            contentColors="bg-green-600/10 text-green-600 border-green-600"
+            value={tables.filter((t) => t.capacity > t.guests.length).length}
+            icon={<Layout />}
           />
         </div>
 
-        <SectionWithDialog
-          title="Liste des tables"
-          dialogTitle="Ajouter une table"
-          dialogDescription="Remplis le formulaire ci-dessous pour ajouter une table."
-          // Optionally, you can pass a form component or children for the form
-        />
-
-        <DataTable
-          columns={tablesColumns}
-          data={guests}
-          renderActions={(row) => (
-            <div className="flex items-center justify-between space-x-2">
-              <Button size="icon" title="Voir">
-                <Eye className="w-4 h-4" />
-              </Button>
-
-              <Button size="icon" title="Confirmer">
-                <Check className="w-4 h-4" />
-              </Button>
-
-              <Button size="icon" title="Restreindre">
-                <Ban className="w-4 h-4" />
-              </Button>
-            </div>
-          )}
-        />
+        <GuestTable guests={guests} tables={tables} />
+        <TablesTable tables={tables} />
       </div>
-    </section>
-  );
-}
-
-// Définition du type extrait
-type SectionWithDialogProps = {
-  title: string;
-  dialogTitle: string;
-  dialogDescription: string;
-  children?: React.ReactNode;
-};
-
-function SectionWithDialog({
-  title,
-  dialogTitle,
-  dialogDescription,
-  children,
-}: Readonly<SectionWithDialogProps>) {
-  return (
-    <div className="mt-8">
-      <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold mb-2">{title}</h3>
-
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus />
-              Ajouter
-            </Button>
-          </DialogTrigger>
-
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>{dialogTitle}</DialogTitle>
-
-              <DialogDescription>{dialogDescription}</DialogDescription>
-            </DialogHeader>
-
-            {children}
-          </DialogContent>
-        </Dialog>
-      </div>
-    </div>
+    </Fragment>
   );
 }

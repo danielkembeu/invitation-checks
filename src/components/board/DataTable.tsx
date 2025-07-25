@@ -1,12 +1,13 @@
 import React from "react";
 
-type Column = {
+type Column<T = any> = {
   header: string;
   accessor: string;
+  renderCell?: (row: T) => React.ReactNode;
 };
 
 type DataTableProps<T> = {
-  columns: Column[];
+  columns: Column<T>[];
   data: T[];
   renderActions?: (row: T) => React.ReactNode;
 };
@@ -17,7 +18,7 @@ export function DataTable<T extends Record<string, any>>({
   renderActions,
 }: Readonly<DataTableProps<T>>) {
   return (
-    <div className="overflow-x-auto rounded-lg border">
+    <div className="overflow-x-auto rounded-lg border my-4">
       <table className="min-w-full divide-y divide-gray-200">
         <thead className="bg-gray-50">
           <tr>
@@ -29,9 +30,11 @@ export function DataTable<T extends Record<string, any>>({
                 {col.header}
               </th>
             ))}
-            <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
+            {renderActions && (
+              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            )}
           </tr>
         </thead>
 
@@ -39,7 +42,7 @@ export function DataTable<T extends Record<string, any>>({
           {data.length === 0 ? (
             <tr>
               <td
-                colSpan={columns.length + 1}
+                colSpan={columns.length + (renderActions ? 1 : 0)}
                 className="text-center py-4 text-gray-400"
               >
                 Aucune donnée
@@ -53,13 +56,14 @@ export function DataTable<T extends Record<string, any>>({
                     key={col.accessor}
                     className="px-4 py-2 whitespace-nowrap"
                   >
-                    {row[col.accessor]}
+                    {col.renderCell ? col.renderCell(row) : row[col.accessor]}
                   </td>
                 ))}
-
-                <td className="px-4 py-2 whitespace-nowrap flex gap-2 items-center">
-                  {renderActions ? renderActions(row) : null}
-                </td>
+                {renderActions && (
+                  <td className="px-4 py-2 whitespace-nowrap flex gap-2 items-center">
+                    {renderActions(row)}
+                  </td>
+                )}
               </tr>
             ))
           )}

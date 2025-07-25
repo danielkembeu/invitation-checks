@@ -15,7 +15,7 @@ export function Overview({ source }: Readonly<OverviewProps>) {
               label={item.name}
               value={item.status}
               icon={<Users />}
-              color={
+              iconColor={
                 item.status === "CONFIRMED"
                   ? "bg-green-100 text-green-600"
                   : "bg-primary/10 text-primary"
@@ -43,7 +43,9 @@ type MetricProps = {
   label: string;
   value: string | number;
   icon?: React.ReactNode;
-  color?: string;
+  iconColor?: string;
+  labelColor?: string;
+  contentColors?: string;
   description?: string;
 };
 
@@ -51,20 +53,24 @@ function Metric({
   label,
   value,
   icon,
-  color = "bg-primary/10 text-primary",
+  iconColor = "bg-primary/10 text-primary",
+  labelColor = "text-primary",
+  contentColors = "bg-primary/15 text-primary border-primary",
   description,
 }: Readonly<MetricProps>) {
   return (
-    <div className="flex-1 flex items-center gap-4 rounded-lg p-5 min-w-[220px] bg-primary/15 border-2 border-primary">
+    <div
+      className={`flex-1 h-32 flex items-center gap-4 rounded-lg p-5 min-w-[220px] border-2 ${contentColors}`}
+    >
       <div
-        className={`flex items-center justify-center rounded-full size-12 ${color}`}
+        className={`flex items-center justify-center rounded-full size-12 ${iconColor}`}
       >
         {icon}
       </div>
 
       <div>
         <div className="text-xs text-gray-500 font-medium">{label}</div>
-        <div className="text-2xl font-bold text-primary">{value}</div>
+        <div className={`text-2xl font-bold ${labelColor}`}>{value}</div>
         {description && (
           <div className="text-xs text-gray-400 mt-1">{description}</div>
         )}

@@ -1,10 +1,10 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { useState, useActionState } from "react";
 import { Button } from "../ui/button";
 import { DialogFooter } from "../ui/dialog";
 import { Input } from "../ui/input";
-import { Guest, GuestStatus, Table } from "@/generated/prisma";
+import { Guest, Table } from "@/generated/prisma";
 import {
   Select,
   SelectContent,
@@ -14,13 +14,14 @@ import {
 } from "../ui/select";
 import generateUniqueCode from "@/helpers/generateUniqueCode";
 import { RefreshCcw } from "lucide-react";
-import { addGuest } from "@/app/actions/create-guest";
+import { saveGuest } from "@/app/actions/create-guest";
 import { toast } from "sonner";
 import { Message } from "./AdminLoginForm";
+import { SubmitButton } from "./SubmitButton";
 
 function getAndIncrementSeatNumber(start: number) {
   let current = parseInt(localStorage.getItem("current") ?? "0", 10);
-  
+
   if (!current || isNaN(current)) {
     current = start;
   }
@@ -35,58 +36,60 @@ type NewGuestFormProps = {
 
 export function NewGuestForm({ tables }: Readonly<NewGuestFormProps>) {
   const [code, setCode] = useState(generateUniqueCode());
-  const [message, setMessage] = useState("");
   const [selectedTable, setSelectedTable] = useState<string>("");
+  const [seatNumber, setSeatNumber] = useState<number | null>(null);
 
-  async function saveGuest(event: FormEvent) {
-    event.preventDefault();
+  // useActionState pour gérer le retour de la server action
+  const [state, formAction] = useActionState(saveGuest, {
+    message: "",
+    ok: false,
+  });
 
-    try {
-      const form = event.target as HTMLFormElement;
-      const formData = new FormData(form);
+  // On gère la vérification de la capacité côté client avant submit
+  function handleFormSubmit(formData: FormData) {
+    const selectedTableId = formData.get("tableId") as string;
+    const table = tables.find((t) => t.id === selectedTableId);
 
-      const table = tables.find((t) => t.id === selectedTable);
-
-      if (table && table?.capacity < table?.guests.length) {
-        toast.error("La capacité de la table a été excédée. Veuillez sélectionner une autre table");
-        return;
-      }
-
-      const seatNumber = getAndIncrementSeatNumber(tables.length);
-
-      const payload = {
-        name: formData.get("name") as string,
-        status: GuestStatus.WAITING,
-        tableId: selectedTable,
-        code,
-        seatNumber,
-      };
-
-      const result = await addGuest(payload);
-
-      if (typeof result === "string") {
-        setMessage(result);
-      } else {
-        toast.success("Invité ajouté avec succès !");
-      }
-    } catch (e: any) {
-      console.log(e);
+    if (table && table.capacity < table.guests.length) {
+      toast.error(
+        "La capacité de la table a été excédée. Veuillez sélectionner une autre table"
+      );
+      return;
     }
+
+    // Génère le seatNumber et l'ajoute au formData
+    const sn = getAndIncrementSeatNumber(tables.length);
+    setSeatNumber(sn);
+
+    formData.set("seatNumber", sn.toString());
+
+    // On laisse le formAction s'occuper du reste (server action)
+    return formAction(formData);
   }
 
   return (
-    <form onSubmit={saveGuest}>
-      {message && <Message message={message} />}
+    <form action={handleFormSubmit} className="space-y-4">
+      {state.message && state.ok === false && (
+        <Message message={state.message} />
+      )}
 
       <Input
         name="name"
         id="name"
         placeholder="Entrez le nom complet"
-        onChange={() => {}}
+        required
       />
 
-      <div className="flex items-center justify-between gap-4">
-        <Input name="code" id="code" value={code} className="flex-1" readOnly />
+      <div className="flex items-center gap-4">
+        <Input
+          name="code"
+          id="code"
+          value={code}
+          className="flex-grow min-w-0"
+          style={{ flexBasis: "80%" }}
+          readOnly
+        />
+
         <Button
           type="button"
           size="icon"
@@ -98,23 +101,29 @@ export function NewGuestForm({ tables }: Readonly<NewGuestFormProps>) {
 
       {/* Champ caché pour la table sélectionnée */}
       <input type="hidden" name="tableId" value={selectedTable} />
+      {/* Champ caché pour seatNumber, mis à jour lors du submit */}
+      <input type="hidden" name="seatNumber" value={seatNumber ?? ""} />
 
-      <Select value={selectedTable} onValueChange={setSelectedTable}>
+      <Select
+        name="tableId"
+        value={selectedTable}
+        onValueChange={setSelectedTable}
+      >
         <SelectTrigger className="w-full">
           <SelectValue placeholder="Choisir la table" />
         </SelectTrigger>
 
         <SelectContent>
-          {tables.map((t, idx) => (
+          {tables.map((t) => (
             <SelectItem key={t.id} value={t.id}>
-              Table {t.tableNumber}
+              {t.tableName} - Table {t.tableNumber}
             </SelectItem>
           ))}
         </SelectContent>
       </Select>
 
       <DialogFooter>
-        <Button type="submit">Soumettre</Button>
+        <SubmitButton />
       </DialogFooter>
     </form>
   );
