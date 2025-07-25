@@ -1,6 +1,13 @@
 import { Metric } from "@/components/board/Overview";
 import { prisma } from "@/db";
-import { Users, Layout, UserCheck2, BookUser, UserMinus2 } from "lucide-react";
+import {
+  Users,
+  Layout,
+  UserCheck2,
+  BookUser,
+  UserMinus2,
+  User,
+} from "lucide-react";
 import { GuestStatus } from "@/generated/prisma";
 import { GuestTable } from "@/components/board/GuestTable";
 import { TablesTable } from "@/components/board/TablesTable";
@@ -57,6 +64,14 @@ export default async function Dashboard() {
             icon={<Users />}
             value={
               guests.filter((g) => g.status === GuestStatus.WAITING).length
+            }
+          />
+
+          <Metric
+            label="Invités présents"
+            icon={<User />}
+            value={
+              guests.filter((g) => g.status === GuestStatus.PRESENT).length
             }
           />
 
