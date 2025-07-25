@@ -33,7 +33,7 @@ export default function UpdateStatusForm({
 
       <Select name="newStatus">
         <SelectTrigger className="w-full">
-          <SelectValue placeholder="Choisir la table" />
+          <SelectValue placeholder="Choisir le nouveau statut" />
         </SelectTrigger>
 
         <SelectContent>

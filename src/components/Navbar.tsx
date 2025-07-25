@@ -1,36 +1,28 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "./ui/button";
+import { LogOut, Power } from "lucide-react";
+import { logout } from "@/app/actions/auth";
 
 const navLinks = [
   { name: "Dashboard", href: "/dashboard" },
   { name: "Invités", href: "/dashboard#guests" },
   { name: "Tables", href: "/dashboard#tables" },
-  { name: "Statistiques", href: "/dashboard#stats" },
 ];
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="relative z-50 w-full bg-white/80 dark:bg-background/80 shadow-md backdrop-blur-md">
+    <nav className="fixed z-50 w-full bg-white/80 dark:bg-background/80 shadow-md backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
         {/* Logo */}
         <a
-          href="/"
+          href="/dashboard"
           className="flex items-center gap-2 font-bold text-xl text-primary"
         >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-            <circle cx="12" cy="12" r="10" fill="#6366f1" />
-            <path
-              d="M8 12l2 2 4-4"
-              stroke="#fff"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-          Mariage
+          <h2>Who's Invited ?</h2>
         </a>
 
         {/* Desktop Nav */}
@@ -46,6 +38,10 @@ export function Navbar() {
               </a>
             </li>
           ))}
+
+          <Button variant="destructive" onClick={logout}>
+            <Power /> Quitter
+          </Button>
         </ul>
 
         {/* Mobile Hamburger */}
@@ -92,6 +88,10 @@ export function Navbar() {
             </li>
           ))}
         </ul>
+
+        <Button>
+          <LogOut /> Quitter
+        </Button>
       </div>
     </nav>
   );

@@ -48,7 +48,7 @@ export function GuestTable({ guests, tables }: Readonly<GuestTableProps>) {
   };
 
   return (
-    <div className="mt-8">
+    <div className="mt-8" id="guests">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold mb-2">Liste des tables</h3>
 
@@ -75,7 +75,7 @@ export function GuestTable({ guests, tables }: Readonly<GuestTableProps>) {
         columns={guestColumns}
         data={guests}
         renderActions={(row) => (
-          <div className="w-fit flex items-center">
+          <div className="w-fit flex items-center gap-4">
             <SectionWithDialog
               dialogTitle="Voir l'invité"
               dialogDescription="Détails de l'invité"

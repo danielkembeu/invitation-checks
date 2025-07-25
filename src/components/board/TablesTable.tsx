@@ -21,7 +21,7 @@ type TablesTableProps = {
 
 export function TablesTable({ tables }: Readonly<TablesTableProps>) {
   return (
-    <div>
+    <div id="tables">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold mb-2">Liste des tables</h3>
 

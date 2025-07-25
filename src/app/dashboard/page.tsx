@@ -25,7 +25,7 @@ export default async function Dashboard() {
     <Fragment>
       <Navbar />
 
-      <div className="px-14 md:px-28 lg:px-60 xl:px-96 py-4 md:py-12 lg:py-20">
+      <div className="px-4 md:px-28 lg:px-60 xl:px-96 py-4 md:py-12 lg:py-20">
         <h2 className="text-xl font-bold mb-4">Gestion des invités</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">

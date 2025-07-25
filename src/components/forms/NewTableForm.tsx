@@ -34,6 +34,7 @@ export default function NewTableForm({
         <Label>Capacité totale</Label>
         <Input
           name="capacity"
+          type="number"
           placeholder="Nombre de place total sur la table (ex: 6)"
         />
       </div>
