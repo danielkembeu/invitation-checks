@@ -4,9 +4,7 @@ import { prisma } from "@/db";
 import { Guest, GuestStatus } from "@/generated/prisma";
 import { revalidatePath } from "next/cache";
 
-async function addGuest(
-  data: Omit<Guest, "id">
-): Promise<string | undefined> {
+async function addGuest(data: Omit<Guest, "id">): Promise<string | undefined> {
   try {
     await prisma.guest.create({ data });
     revalidatePath("/dashboard");
@@ -30,6 +28,8 @@ export async function saveGuest(prevState: any, formData: FormData) {
     tableId,
     code,
     seatNumber,
+    createdAt: new Date(),
+    updatedAt: new Date(),
   };
 
   try {
