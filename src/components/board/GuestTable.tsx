@@ -7,8 +7,8 @@ import { Button } from "../ui/button";
 import { Eye, Pencil, Plus } from "lucide-react";
 import { NewGuestForm } from "../forms/NewGuestForm";
 import UpdateStatusForm from "../forms/UpdateStatusForm";
-import GuestCard from "../GuestCard";
-import StatusTag from "../StatusTag";
+import { GuestCard } from "../GuestCard";
+import { StatusTag } from "../StatusTag";
 import { CodeCell } from "../CodeCell";
 
 const guestColumns = [
@@ -16,7 +16,7 @@ const guestColumns = [
   {
     header: "Statut",
     accessor: "status",
-    renderCell: (row: Guest) => <StatusTag data={row} />,
+    renderCell: (row: Guest) => <StatusTag status={row.status} />,
   },
   { header: "Place", accessor: "seatNumber" },
   {

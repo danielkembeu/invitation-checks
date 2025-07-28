@@ -1,15 +1,15 @@
 "use client";
 
-import { Guest } from "@/generated/prisma";
+import { GuestStatus } from "@/generated/prisma";
 import React from "react";
 
 type StatusTagProps = {
-  data: Guest;
+  status: GuestStatus;
 };
 
-export default function StatusTag({ data }: Readonly<StatusTagProps>) {
+export function StatusTag({ status }: Readonly<StatusTagProps>) {
   const renderColors = () => {
-    switch (data.status) {
+    switch (status) {
       case "ABSENT":
         return { fg: `text-red-600`, bg: "bg-red-100" };
       case "WAITING":
@@ -28,7 +28,7 @@ export default function StatusTag({ data }: Readonly<StatusTagProps>) {
     <div
       className={`rounded-full ${fg} ${bg} flex items-center justify-center py-1 px-4 w-fit text-sm font-medium`}
     >
-      <span>{data.status}</span>
+      <span>{status}</span>
     </div>
   );
 }

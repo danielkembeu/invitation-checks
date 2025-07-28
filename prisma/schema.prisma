@@ -23,11 +23,13 @@ enum GuestStatus {
 
 model Table {
   id          String   @id @default(uuid())
-  tableName   String   @default("Default name")
-  tableNumber Int
+  tableName   String   @unique @default("Default name")
+  tableNumber Int      @unique
   capacity    Int
   createdAt   DateTime @default(now())
   guests      Guest[]
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id])
 }
 
 model Guest {
@@ -43,4 +45,13 @@ model Guest {
   table Table @relation(fields: [tableId], references: [id])
 
   @@unique([tableId, seatNumber])
+}
+
+model Event {
+  id          String   @id @default(uuid())
+  name        String
+  description String
+  startDate   DateTime
+  endDate     DateTime
+  tables      Table[]
 }

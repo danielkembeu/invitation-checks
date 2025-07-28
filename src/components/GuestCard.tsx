@@ -3,8 +3,9 @@
 import { Guest, GuestStatus } from "@/generated/prisma";
 import React from "react";
 
-export default function GuestCard({ data }: Readonly<{ data: Guest }>) {
+export function GuestCard({ data }: Readonly<{ data: Guest }>) {
   let statusColor = "bg-primary/10 text-primary";
+
   if (data.status === GuestStatus.CONFIRMED)
     statusColor = "bg-green-100 text-green-600";
   else if (data.status === GuestStatus.WAITING)

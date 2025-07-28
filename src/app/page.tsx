@@ -38,6 +38,7 @@ export default function LandingPage() {
             Rejoignez les leaders, apprenez et connectez lors de la conférence
             la plus inspirante de l’année.
           </motion.p>
+
           <motion.div
             initial={{ scale: 0.95 }}
             animate={{ scale: 1 }}
@@ -50,7 +51,7 @@ export default function LandingPage() {
               </Button>
             </Link>
 
-            <div className="text-gray-600 self-center">
+            {/* <div className="text-gray-600 self-center">
               <Countdown
                 date={eventDate}
                 renderer={({ days, hours, minutes, seconds }) => (
@@ -59,9 +60,10 @@ export default function LandingPage() {
                   </span>
                 )}
               />
-            </div>
+            </div> */}
           </motion.div>
         </div>
+
         <div className="mt-12 md:absolute md:top-0 md:right-0 md:w-1/2 h-96 md:h-full relative">
           <Image
             src={hero1}
