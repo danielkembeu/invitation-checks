@@ -63,6 +63,7 @@ export function NewGuestForm({ tables }: Readonly<NewGuestFormProps>) {
 
     formData.set("seatNumber", sn.toString());
 
+    setCode(generateUniqueCode());
     // On laisse le formAction s'occuper du reste (server action)
     return formAction(formData);
   }
